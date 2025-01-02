@@ -33,13 +33,36 @@ class Tree {
         return root;
     }
 
-    preOrder(root) {
-        if (root === null || root === undefined) {return;}
-        console.log (root.data);
-        this.preOrder(root.left);
-        this.preOrder(root.right);
+    find (value, root = this.root) {
+        if(root === null || root.data === value) {return root;}
+
+        if (value < root.data) {
+            return this.find(value, root.left);
+        }
+        return this.find(value, root.right);
+    }
+
+    levelOrder (array = [], queue = [], root = this.root, callback) {
+        if(root === null) {return;}
+        if(callback === null) {throw new Error(`Callback not found: Callback is required`);}
+        callback(root);
+        
+        array.push(root.data);
+
+        queue.push(root.left);
+        queue.push(root.right);
+
+        while (queue.length){
+            const level = queue[0];
+            queue.shift();
+            this.levelOrder(array, queue, level)
+        }
+
+        return array;
     }
 }
+
+
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
     if (node === null) {
@@ -56,9 +79,8 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = new Tree(array);
-// tree.preOrder(tree.root);
-
 prettyPrint(tree.root);
+console.log (tree.levelOrder());
 
 
 

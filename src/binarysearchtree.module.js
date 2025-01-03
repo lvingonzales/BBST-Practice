@@ -42,9 +42,9 @@ class Tree {
         return this.find(value, root.right);
     }
 
-    levelOrder (array = [], queue = [], root = this.root, callback) {
+    levelOrder (callback, array = [], queue = [], root = this.root) {
         if(root === null) {return;}
-        if(callback === null) {throw new Error(`Callback not found: Callback is required`);}
+        if(callback === undefined) {throw new Error(`Callback not found: Callback is required`);}
         callback(root);
         
         array.push(root.data);
@@ -55,10 +55,77 @@ class Tree {
         while (queue.length){
             const level = queue[0];
             queue.shift();
-            this.levelOrder(array, queue, level)
+            this.levelOrder(callback, array, queue, level)
         }
 
         return array;
+    }
+
+    inOrder (callback, arr = [], root = this.root){
+        if(root === null){return;}
+
+        this.inOrder(callback, arr, root.left);
+        callback(root);
+        arr.push(root.data);
+        this.inOrder(callback, arr, root.right);
+
+        return arr;
+    }
+
+    preOrder(callback, arr = [], root = this.root) {
+        if(root === null){return;}
+
+        callback(root);
+        arr.push(root.data);
+
+        this.preOrder(callback, arr, root.left);
+        this.preOrder(callback, arr, root.right);
+
+        return arr;
+    }
+
+    postOrder(callback, arr = [], root = this.root) {
+        if(root === null){return;}
+
+        this.postOrder(callback, arr, root.left);
+        this.postOrder(callback, arr, root.right);
+
+        callback(root);
+        arr.push(root.data);
+
+        return arr;
+    }
+    
+    depth(node, root = this.root) {
+        if(root === null){return -1;}
+        let dist = -1;
+
+        if((node === root.data) || (dist = this.depth(node, root.left)) >= 0 || (dist = this.depth(node, root.right)) >= 0) {
+            return dist + 1;
+        }
+        return dist;
+    }
+
+    findHeight(node, root = this.root){
+        if (root === null){return -1}
+
+        let leftHeight = this.findHeight(node, root.left);
+
+        let rightHeight = this.findHeight(node, root.right);
+
+        let ans = Math.max(leftHeight, rightHeight) + 1;
+
+        if(root.data === node){
+            height = ans;
+        }
+
+        return ans;
+    }
+
+    height(node, root = this.root) {
+        this.findHeight(node, root);
+
+        return height;
     }
 }
 
@@ -77,10 +144,16 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     }
 };
 
+let height = -1;
+
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = new Tree(array);
 prettyPrint(tree.root);
-console.log (tree.levelOrder());
+console.log(tree.height(4))
+
+function callbackTest (node) {
+    return;
+}
 
 
 

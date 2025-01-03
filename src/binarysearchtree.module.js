@@ -63,6 +63,7 @@ class Tree {
 
     inOrder (callback, arr = [], root = this.root){
         if(root === null){return;}
+        if(callback === undefined) {throw new Error(`Callback not found: Callback is required`);}
 
         this.inOrder(callback, arr, root.left);
         callback(root);
@@ -74,6 +75,7 @@ class Tree {
 
     preOrder(callback, arr = [], root = this.root) {
         if(root === null){return;}
+        if(callback === undefined) {throw new Error(`Callback not found: Callback is required`);}
 
         callback(root);
         arr.push(root.data);
@@ -86,6 +88,7 @@ class Tree {
 
     postOrder(callback, arr = [], root = this.root) {
         if(root === null){return;}
+        if(callback === undefined) {throw new Error(`Callback not found: Callback is required`);}
 
         this.postOrder(callback, arr, root.left);
         this.postOrder(callback, arr, root.right);
@@ -123,9 +126,39 @@ class Tree {
     }
 
     height(node, root = this.root) {
+
         this.findHeight(node, root);
 
         return height;
+    }
+
+    isBalanced(root = this.root){
+        if(root === null){return true;}
+
+        let leftHeight = this.balanceHeightUtil(root.left);
+        let rightHeight = this.balanceHeightUtil(root.right);
+
+        if ((leftHeight - rightHeight) <= 1 && this.isBalanced(root.left) == true  && this.isBalanced(root.right) == true){
+            return true;
+        }
+        return false;
+    }
+
+    balanceHeightUtil(root){
+        if (root === null) {return 0;}
+
+        return Math.max(this.balanceHeightUtil(root.left), this.balanceHeightUtil(root.right)) + 1;
+    }
+
+    reBalance(newArr = []){
+        this.inOrder(addToArray);
+
+        function addToArray(node){
+            return newArr.push(node.data);
+        }
+        
+        this.root = this.buildTree(newArr, 0, newArr.length - 1);
+        return `Rebalanced!`;
     }
 }
 
@@ -146,15 +179,39 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 let height = -1;
 
-const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-const tree = new Tree(array);
-prettyPrint(tree.root);
-console.log(tree.height(4))
+// Driver script
 
-function callbackTest (node) {
+function dummyCallback() {
     return;
 }
 
+const arr = [7,13,21,25,47,54,55,82,91]
+
+// initial creation and printout
+let tree = new Tree(arr);
+prettyPrint(tree.root);
+console.log(tree.isBalanced());
+console.log(`inOrder: ${tree.inOrder(dummyCallback)}`);
+console.log(`preOrder: ${tree.preOrder(dummyCallback)}`);
+console.log(`postOrder: ${tree.postOrder(dummyCallback)}`);
+
+// adding to unbalance the tree
+tree.root.left.left.right = new Node(8);
+tree.root.left.left.left = new Node(6);
+tree.root.left.left.right.right = new Node(10);
+tree.root.left.left.left.left = new Node(4);
+tree.root.left.left.right.right.right = new Node(12);
+prettyPrint(tree.root);
+console.log(tree.isBalanced());
+tree.reBalance();
+prettyPrint(tree.root);
+console.log(tree.isBalanced());
+
+// Final print out
+console.log(`levelOrder: ${tree.levelOrder(dummyCallback)}`);
+console.log(`inOrder: ${tree.inOrder(dummyCallback)}`);
+console.log(`preOrder: ${tree.preOrder(dummyCallback)}`);
+console.log(`postOrder: ${tree.postOrder(dummyCallback)}`);
 
 
 

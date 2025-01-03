@@ -42,6 +42,48 @@ class Tree {
         return this.find(value, root.right);
     }
 
+    insert(key, currNode){
+        if(currNode === null){return new Node(key);}
+
+        if(currNode.data === key){return currNode;}
+
+        if(key <= currNode.data){
+            currNode.left = this.insert(key, currNode.left);
+        } else if(key > currNode.data){
+            currNode.right = this.insert(key, currNode.right);
+        }
+
+        return currNode;
+    }
+
+    delNodeGetSuccessor(node){
+        node = node.right;
+        while(node !== null && node.left !== null){
+            node = node.left;
+        }
+        return node;
+    }
+
+    deleteNode(node ,root = this.root) {
+        if (root === null){return root;}
+
+        if(root.data > node){
+            root.left = this.deleteNode(node, root.left);
+        } else if(root.data < node){
+            root.right = this.deleteNode(node, root.right);
+        } else {
+            if(root.left === null){return root.right;}
+
+            if(root.right === null){return root.left;}
+
+            let successor = this.delNodeGetSuccessor(root);
+            root.data = successor.data;
+            root.right = this.deleteNode(successor.data, root.right);
+        }
+
+        return root; 
+    }
+
     levelOrder (callback, array = [], queue = [], root = this.root) {
         if(root === null) {return;}
         if(callback === undefined) {throw new Error(`Callback not found: Callback is required`);}
@@ -196,11 +238,9 @@ console.log(`preOrder: ${tree.preOrder(dummyCallback)}`);
 console.log(`postOrder: ${tree.postOrder(dummyCallback)}`);
 
 // adding to unbalance the tree
-tree.root.left.left.right = new Node(8);
-tree.root.left.left.left = new Node(6);
-tree.root.left.left.right.right = new Node(10);
-tree.root.left.left.left.left = new Node(4);
-tree.root.left.left.right.right.right = new Node(12);
+for (let i = 0; i < 10; i++){
+    tree.insert(Math.floor(Math.random() * 100), tree.root);
+}
 prettyPrint(tree.root);
 console.log(tree.isBalanced());
 tree.reBalance();
